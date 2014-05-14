@@ -18,6 +18,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.oio.OioDatagramChannel;
 
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class Main {
 
             InetAddress groupAddress = InetAddress.getByName(GROUP);
             InetSocketAddress gangliaSocket = new InetSocketAddress(GROUP, PORT);
-            InetSocketAddress localSocket = new InetSocketAddress("172.31.7.7",PORT);
+            InetSocketAddress localSocket = new InetSocketAddress("172.31.7.9",PORT);
 
             NetworkInterface mcIf = NetworkInterface.getByName(NETWORK_INTERFACE);  // TODO determine from main address
 
@@ -87,20 +88,24 @@ public class Main {
 //                .option(ChannelOption.IP_MULTICAST_IF, mcIf) // Needed at all? - want to receive on all IF
                 .option(ChannelOption.SO_REUSEADDR, true)
 
-//                .localAddress(gangliaSocket) // => Netty listening on udp /239.2.11.71:8649
+                .localAddress(gangliaSocket) // => Netty listening on udp /239.2.11.71:8649
 //              .localAddress(8649) // => Netty listening on udp 0.0.0.0/0.0.0.0:8649 OR BindException: Address already in use
-                .localAddress(localSocket) // => Netty listening on udp /172.31.7.7:8649
+//                .localAddress(localSocket) // => Netty listening on udp /172.31.7.7:8649
 
                 .remoteAddress(remoteSocket) // Makes no difference
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     public void initChannel(Channel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
-                        pipeline.addLast(new SimpleChannelInboundHandler<DatagramChannel>() {
+                        pipeline.addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
+                            @Override
+                            public boolean acceptInboundMessage(Object msg) throws Exception {
+                                return true;
+                            }
 
                             @Override
                             protected void channelRead0(ChannelHandlerContext ctx,
-                                                        DatagramChannel msg) throws Exception {
+                                                        DatagramPacket msg) throws Exception {
                                 logger.info("Got a packet :-)");
                             }
                         });
