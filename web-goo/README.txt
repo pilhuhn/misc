@@ -1,3 +1,5 @@
+== Running with a Servlet Filter doing work
+
 Using an immediate Future:
 
 $ curl -i http://localhost:8080/web-goo/test.jsonw?jsonp=jsonp\&immediate=true
@@ -28,3 +30,30 @@ Date: Sun, 08 Jun 2014 19:22:58 GMT
 jsonp(["Hello","World"]);
 
 => Correct Content-Type and body => onComplete called
+
+== No Servlet Filter
+
+Both times it "just works"
+
+$ curl -i http://localhost:8080/web-goo/test.json?immediate=false
+HTTP/1.1 200 OK
+Connection: keep-alive
+X-Powered-By: Undertow/1
+Server: WildFly/8
+Transfer-Encoding: chunked
+Content-Type: application/json
+Date: Mon, 09 Jun 2014 06:58:56 GMT
+
+["Hello","World"]
+
+
+$ curl -i http://localhost:8080/web-goo/test.json?immediate=true
+HTTP/1.1 200 OK
+Connection: keep-alive
+X-Powered-By: Undertow/1
+Server: WildFly/8
+Transfer-Encoding: chunked
+Content-Type: application/json
+Date: Mon, 09 Jun 2014 06:59:00 GMT
+
+["Hello","World"]
